@@ -9,12 +9,9 @@ ROLES = (
         ('Patient', 'patient')
     )
 
-def cv_upload(instance,filename):
-    return "doctors/%s/cv/%s"%(instance.id,filename)
-
-def certificate_upload(instance,filename):
-    return "doctors/%s/certificates/%s"%(instance.id,filename)
-
+def user_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    return 'doctors/user_{0}/{1}'.format(instance.user, filename)
 
 class User(AbstractUser):
     is_patient = models.BooleanField(default=False)
@@ -25,21 +22,18 @@ class User(AbstractUser):
 
 
 class Patient(models.Model):
-    user = models.OneToOneField(User, verbose_name=_("Patient"),primary_key= True, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, verbose_name=_("Patient"), on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.user
+        return str(self.user)
 
 class Doctor(models.Model):
-    user = models.OneToOneField(User, verbose_name=_("Doctor"),primary_key= True, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, verbose_name=_("Doctor"), on_delete=models.CASCADE)
     hospital = models.CharField(_("Hospital"), max_length=50)
     specialist = models.CharField(_("Specialist"), max_length=50)
-    cv = models.FileField(_("CV"), upload_to=cv_upload, max_length=100)
+    cv = models.FileField(_("CV"), upload_to = user_directory_path, max_length=100)
+    certificate = models.ImageField(_("Certificate"), upload_to =user_directory_path )
+    profile_photo = models.ImageField(_("Profile Photo"),upload_to =user_directory_path )
 
     def __str__(self):
-        return self.user
-
-
-class DoctorCertificates(models.Model):
-    doctor = models.ForeignKey( Doctor, related_name='doctor_certificate', on_delete=models.CASCADE, verbose_name=_("Doctor"))
-    certificate = models.ImageField(_("Certificate"), upload_to=certificate_upload)
+        return str(self.user)

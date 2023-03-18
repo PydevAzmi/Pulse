@@ -1,0 +1,18 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Registeration</title>
+</head>
+<body>
+    <form action="{% url 'accounts:DoctorRegister' %}" method = "post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{doctor_register_form}}
+       
+        <button type="submit"> Create </button>
+    </form>
+</body>
+</html>
