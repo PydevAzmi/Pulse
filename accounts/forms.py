@@ -1,6 +1,6 @@
 from django import forms
 from django_countries.widgets import CountrySelectWidget
-from .models import User, Patient, Doctor 
+from .models import User, Patient, Doctor ,Hospital
 from django.db import transaction
 from django.contrib.auth.forms import UserCreationForm
 
@@ -26,7 +26,7 @@ class PatientSignUpForm(UserCreationForm):
 
 
 class DoctorSignUpForm(UserCreationForm):
-    hospital  = forms.CharField(required=True)
+    hospital_or_center  =forms.ModelChoiceField(queryset=Hospital.objects.all(), required=True)
     certificate = forms.ImageField(required=True)
     specialist = forms.CharField(required=True)
     cv = forms.FileField(required=True)
@@ -45,7 +45,7 @@ class DoctorSignUpForm(UserCreationForm):
         user.is_doctor = True
         user.save()
         doctor = Doctor.objects.create(user = user)
-        doctor.hospital = self.cleaned_data.get('hospital')
+        doctor.hospital = self.cleaned_data.get('hospital_or_center')
         doctor.cv = self.cleaned_data.get('cv')
         doctor.specialist = self.cleaned_data.get('specialist')
         doctor.certificate = self.cleaned_data.get('certificate')
