@@ -86,7 +86,7 @@ class Hospital(models.Model):
 class Review(models.Model):
     patient = models.ForeignKey(Patient ,verbose_name=_("Patient"), on_delete=models.CASCADE)
     doctor = models.ForeignKey(Doctor , related_name="doctor_reviews", verbose_name=_("Doctor"),null=True, blank=True, on_delete=models.CASCADE)
-    hospital = models.ForeignKey(Hospital , related_name="hospital_reviews", verbose_name=_("Doctor"),null=True, blank=True, on_delete=models.CASCADE)
+    hospital = models.ForeignKey(Hospital , related_name="hospital_reviews", verbose_name=_("Hospital"),null=True, blank=True, on_delete=models.CASCADE)
     rate = models.IntegerField(_("Rate"), validators=[maxx_length(5), minn_length(0)])
     review = models.TextField(_("Review"), max_length=500)
     created_at =models.DateTimeField(_("created at"), default=timezone.now )
