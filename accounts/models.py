@@ -6,6 +6,7 @@ from django.contrib.auth.models import AbstractUser ,AbstractBaseUser
 from django.core.validators import MaxValueValidator as maxx_length, MinValueValidator as minn_length
 # Create your models here.  
 
+
 ROLES = (
         ('Doctor', 'doctor'),
         ('Patient', 'patient')
