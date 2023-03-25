@@ -21,6 +21,7 @@ from django.conf import settings
 
 urlpatterns = [
     path('accounts/', include('accounts.urls', namespace = "accounts")),
+    path("consult-now/", include("consultation.urls", namespace = "consultation")),
     #path('accounts/', include('django.contrib.auth.urls')),
     
     path('admin/', admin.site.urls),
