@@ -1,0 +1,21 @@
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label class="form-label" for="{{ form.question_type.id_for_label }}">Question Type</label>
+      {{ form.question_type }}
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="{{ form.question_text.id_for_label }}">Question Text</label>
+      {{ form.question_text }}
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="{{ form.answer_text.id_for_label }}">Answer Text</label>
+      {{ form.answer_text }}
+    </div>
+    <div class="form-group form-check">
+      {{ form.is_active }}
+      <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Is Active?</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  
