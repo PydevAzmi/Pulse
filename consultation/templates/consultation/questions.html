@@ -1,17 +1,6 @@
-<form method="post" action = "{% url 'consultation:questions' %}">
+<form method="post" enctype="multipart/form-data" action = "{% url 'consultation:questions' %}">
     {% csrf_token %}
-    {% for field in form %}
-      <div class="form-group">
-        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
-        {% if field.help_text %}
-          <small class="form-text text-muted">{{ field.help_text }}</small>
-        {% endif %}
-        {% for error in field.errors %}
-          <div class="invalid-feedback">{{ error }}</div>
-        {% endfor %}
-      </div>
-    {% endfor %}
+    {{form}}
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
   

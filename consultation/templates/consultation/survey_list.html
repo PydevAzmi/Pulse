@@ -1,0 +1,12 @@
+
+
+{% block content %}
+  <h1>Survey List</h1>
+  <ul>
+    {% for survey in surveys %}
+      <li><a href="{% url 'survey_detail' survey.pk %}">{{ survey.title }}</a></li>
+    {% empty %}
+      <li>No surveys found.</li>
+    {% endfor %}
+  </ul>
+

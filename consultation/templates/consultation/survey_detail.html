@@ -1,0 +1,11 @@
+
+
+  <h1>Survey Detail</h1>
+  <p><strong>Patient Name:</strong> {{ survey.patient }}</p>
+  <p><strong>Title:</strong> {{ survey.title }}</p>
+  <p><strong>Description:</strong> {{ survey.description }}</p>
+  <p><strong>MRI:</strong> {{ survey.mri.url }}</p>
+  <p><strong>CT:</strong> {{ survey.ct.url }}</p>
+  <p><strong>ECG:</strong> {{ survey.ecg.url }}</p>
+  <p><strong>Completed:</strong> {% if survey.completed %}Yes{% else %}No{% endif %}</p>
+

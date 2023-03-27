@@ -1,27 +1,68 @@
 
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render,get_object_or_404
 from django.urls import reverse
-from .forms import QuestionForm ,CreateQuestionForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
+from .models import Survey ,Question, Answer
+from .forms import  CreateQuestionForm, SurveyForm, AnswerForm
+
 # Create your views here.
-def quiz(request):
+
+
+@login_required
+def survey_create(request):
     if request.method == 'POST':
-        form = QuestionForm(request.POST)
+        form = SurveyForm(request.POST, request.FILES)
         if form.is_valid():
-            print("yes Valid")
-            answers = form.answers_dict()
-            print(answers)
-            # do something with the user's answers
+            survey = form.save(commit=False)
+            survey.patient = request.user
+            survey.save()
+            return redirect('consultation:answer_create', survey_id=survey.id)
     else:
-        form = QuestionForm()
+        form = SurveyForm()
+    return render(request, 'consultation/survey_form.html', {'form': form})
+
+@login_required
+def answer_create(request, survey_id):
+    survey = get_object_or_404(Survey, id=survey_id)
+    
+    if request.method == 'POST':
+        form = AnswerForm(request.POST)
+        if form.is_valid():
+            answer = form.save(commit=False)
+            answer.survey = survey
+            answer.save()
+            print( 'Answer added successfully!')
+            return redirect('consultation:answer_create', survey_id=survey.id)
+    else:
+        form = AnswerForm()
+
+    context = {
+        'survey': survey,
+        'questions': Question.objects.filter(is_active=True),
+        'form': form
+    }
+    return render(request, 'consultation/answer_form.html', context)
+
+
+
+
+def survey(request):
+    if request.method == 'POST':
+        form = SurveyForm(request.POST,request.FILES)
+        if form.is_valid():
+            form.save()
+    else:
+        form = SurveyForm()
     return render(request, 'consultation/questions.html', {'form': form})
 
-
+## For Doctors To Create Their Own Questions
 def create_question(request):
     if request.method == 'POST':
         form = CreateQuestionForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect(reverse('consultation:questions')) # replace with your desired URL
+            return redirect(reverse('consultation:questions')) 
     else:
         form = CreateQuestionForm()
     return render(request, 'consultation/create_question.html', {'form': form})

@@ -1,0 +1,32 @@
+
+
+
+  <h1>Create Answer</h1>
+  
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+  </form>
+  <h1>Create Answer</h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="question">Question:</label>
+      <select name="question" id="question" class="form-control">
+        {% for question in questions %}
+          <option value="{{ question.pk }}">{{ question.text }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="answer">Answer:</label>
+      <textarea name="answer" id="answer" rows="5" class="form-control"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="scan">Scan:</label>
+      <input type="file" name="scan" id="scan" class="form-control-file">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+
