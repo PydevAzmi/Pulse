@@ -53,8 +53,7 @@ def login(request):
             if user_login is not None:
                 auth_login(request, user_login)
                 return redirect(reverse('accounts:HomePage'))
-        else:
-            pass
+
 
     else:
         form = AuthenticationForm()

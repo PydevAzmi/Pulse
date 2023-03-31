@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import User, Doctor, Patient, Hospital, Review
-
+from .models import User, Doctor, Patient, Hospital
+from consultation.models import Review
 from django import forms
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
@@ -104,4 +104,4 @@ admin.site.register(User)
 admin.site.register(Doctor, DoctorReviews)
 admin.site.register(Patient)
 admin.site.register(Hospital,HospitalReviews)
-admin.site.register(Review)
+

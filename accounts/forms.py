@@ -16,7 +16,7 @@ class PatientSignUpForm(UserCreationForm):
 
     @transaction.atomic
     def save(self):
-        user =  super().save(commit = False)
+        user = super().save(commit = False)
         user.is_patient = True
         user.role = 'Patient'
         user.save()
