@@ -1,20 +1,30 @@
 from django import forms
-
 from .models import Question ,Survey, Question,Answer,GENDER
 from django.db import transaction
 
     
 class SurveyForm(forms.ModelForm):
-    '''
-    def __init__(self, *args, **kwargs):
+    def __init__(self,  *args, **kwargs):
         super(SurveyForm, self).__init__(*args, **kwargs)
-
-        for i,question in enumerate (Question.objects.filter(is_active=True)) :
-            self.fields[f'Q-{i}'] = forms.ChoiceField(
+        for question in (Question.objects.filter(is_active=True)) :
+            self.fields[f'Q-{question.id}'] = forms.ChoiceField(
                                 choices=Answer.CHOICES,
                                 widget=forms.RadioSelect,
                                 label=question.question_text
-                                )'''
+                                )
+    @transaction.atomic
+    def save(self):
+        data = self.cleaned_data
+        survey = super().save(commit = False)   
+        survey.title = f"patient - {self.cleaned_data.get('name')}"
+        survey.save()
+        
+        for question in (Question.objects.filter(is_active=True)) :
+            submission = Answer.objects.create(survey = survey)
+            submission.question = question
+            submission.answer_choice = data[f'Q-{question.id}']
+            submission.save()
+
     class Meta:
         model = Survey
         fields = ['name',"age", 'gender','mri','ecg','description']

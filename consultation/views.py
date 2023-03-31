@@ -46,17 +46,21 @@ def answer_create(request, survey_id):
 
 
 
-
+@login_required
 def survey(request):
     if request.method == 'POST':
         form = SurveyForm(request.POST,request.FILES)
         if form.is_valid():
+            form.instance.patient = request.user
             form.save()
+            return redirect(reverse(f'consultation:answer_create {form.instance.pk} '))
     else:
         form = SurveyForm()
     return render(request, 'consultation/questions.html', {'form': form})
 
+
 ## For Doctors To Create Their Own Questions
+@login_required
 def create_question(request):
     if request.method == 'POST':
         form = CreateQuestionForm(request.POST)
