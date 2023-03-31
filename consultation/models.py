@@ -35,7 +35,7 @@ class Survey(models.Model):
     age = models.IntegerField(_("Age"),validators=[maxx_length(100), minn_length(1)], null=True, blank=True)
     date_of_birth = models.DateField(default=None, null=True ,blank=True)
     gender = models.CharField(_("Gender"), null=True, blank=True,max_length=50, choices=GENDER)
-    patient = models.ForeignKey('accounts.User', on_delete=models.CASCADE)
+    patient = models.ForeignKey('accounts.User', on_delete=models.CASCADE, null=True ,blank=True)
     #questions = models.ManyToManyField("Question",related_name="survey_questions" ,verbose_name=_("Questions"))
     #answers = models.ManyToManyField("Answer", related_name=_("survey_answers"),verbose_name=_("Answers"))
     mri =models.FileField(_("MRI"), upload_to=patient_dir_path) 
@@ -60,8 +60,8 @@ class Question(models.Model):
 
 
 class Answer(models.Model):
-    survey = models.ManyToManyField(Survey, verbose_name=_("Survey"),related_name="survey_ans")
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    survey = models.ForeignKey(Survey, verbose_name=_("Survey"),related_name="survey_ans",on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, null=True,blank=True)
 
     CHOICES = (
         ('yes', 'Yes'),
