@@ -43,7 +43,16 @@ INSTALLED_APPS = [
     # My Apps
     "settings",
     "consultation",
+    
+    # api
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
 
+    'rest_auth',
+    'rest_auth.registration',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -140,3 +149,22 @@ MEDIA_ROOT  = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = ('username', 'email')
+ACCOUNT_USERNAME_REQUIRED = True
+
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'accounts.serializers.PatientSignUpSerializer',
+    'REGISTER_SERIALIZER': 'accounts.serializers.DoctorRegisterationSerializer'
+}
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ]
+}
