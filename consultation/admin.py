@@ -7,6 +7,7 @@ class QuetionInline(admin.TabularInline):
 
 class AnswerInline(admin.TabularInline):
     model = Answer
+    list_display = ("tiltle" , 'answer_choice')
 
 class QuesAswers(admin.ModelAdmin):
     inlines = [
