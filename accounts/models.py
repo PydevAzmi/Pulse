@@ -1,10 +1,7 @@
 from django.conf import settings
 from django.db import models
-#from django.db.models.signals import post_save
-#from django.dispatch import receiver
 from django.utils.translation import gettext as _
 from django_countries.fields import CountryField
-#from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import AbstractUser 
 # Create your models here.  
 
@@ -44,14 +41,6 @@ class User(AbstractUser):
     Phone_number = models.CharField(_("Phone Number"), max_length =20)
     country = CountryField(blank= True)
     gender = models.CharField(_("Gender"), max_length=50, choices=GENDER)
-
-'''
-@receiver(post_save, sender = settings.AUTH_USER_MODEL)
-def create_auth_token(sender, instane = None , created = False, **kwargs):
-    if created :
-        Token.objects.create(user = instane)
-'''   
-    
 
 class Patient(models.Model):
     user = models.OneToOneField( settings.AUTH_USER_MODEL,related_name='User_Patient', verbose_name=_("Patient"), on_delete=models.CASCADE)
