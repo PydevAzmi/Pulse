@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from allauth.account.adapter import get_adapter
-from .models import Patient, Doctor ,Hospital ,User
+from .models import Patient, Doctor ,Hospital 
 
 # For Registeration
 from rest_auth.registration.serializers import RegisterSerializer 
@@ -60,6 +60,9 @@ class PatientSignUpSerializer(RegisterSerializer):
         return user
 
 class DoctorRegisterationSerializer(RegisterSerializer):
+    def enforce_csrf(self, request):
+        pass
+
     first_name = serializers.CharField(write_only=True, required=True, max_length=50)
     last_name = serializers.CharField(write_only=True, max_length=50)
     country = CountryField()

@@ -15,7 +15,8 @@ class PatientRegisterApi(RegisterView):
 
 class DoctorRegisterationApi(RegisterView):
     serializer_class = DoctorRegisterationSerializer
-    permission_classes = [permissions.AllowAny] 
+    def enforce_csrf(self, request):
+        pass
 
 
 class ObtainJWTLoginViewApi(ObtainJSONWebToken):
