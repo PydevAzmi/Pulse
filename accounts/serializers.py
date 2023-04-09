@@ -60,8 +60,6 @@ class PatientSignUpSerializer(RegisterSerializer):
         return user
 
 class DoctorRegisterationSerializer(RegisterSerializer):
-    def enforce_csrf(self, request):
-        pass
 
     first_name = serializers.CharField(write_only=True, required=True, max_length=50)
     last_name = serializers.CharField(write_only=True, max_length=50)
@@ -141,4 +139,3 @@ class LoginJWTSerializer(JSONWebTokenSerializer):
             msg = 'Must include "{username_field}" and "password".'
             msg = msg.format(username_field=self.username_field)
             raise serializers.ValidationError(msg)
-        
