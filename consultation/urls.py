@@ -1,5 +1,5 @@
 from django.urls import path 
-from . import views
+from . import views , api
 app_name = "consultation"
 urlpatterns = [
     path("", views.survey, name='questions'),
@@ -7,6 +7,9 @@ urlpatterns = [
 
     path('patient/survey/', views.survey_create, name='patient_survey'),
     path('patient/survey/<int:survey_id>', views.answer_create, name='answer_create'),
+
+    #API
+    path('api/create-survey',api.CreateSurveyApi.as_view(), name= "create_survey" )
 
 
     
