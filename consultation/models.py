@@ -4,6 +4,11 @@ from django.utils.translation import gettext as _
 from django.utils import timezone
 # Create your models here.
 
+Q_CHOICES = (
+        ('yes', 'Yes'),
+        ('no', 'No'),
+        ('dont_know', 'Don\'t Know'),
+    )
 GENDER = [ 
         ('Male', 'Male'),
         ('Female', 'Female'),
@@ -45,7 +50,21 @@ class Survey(models.Model):
     description = models.TextField(_("Description"),null=True, blank=True)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     completed = models.BooleanField(_("Completed"),default=False)
-    
+
+    ## Questions 
+    question_1 = models.CharField(_("1"),null=True, blank=True, max_length=50, choices=Q_CHOICES)
+    question_2 = models.CharField(_("2"),null=True, blank=True, max_length=50, choices=Q_CHOICES)
+    question_3 = models.CharField(_("3"),null=True, blank=True, max_length=50, choices=Q_CHOICES)
+    question_4 = models.CharField(_("4"),null=True, blank=True, max_length=50, choices=Q_CHOICES)
+    question_5 = models.CharField(_("5"),null=True, blank=True, max_length=50, choices=Q_CHOICES)
+    question_6 = models.CharField(_("6"),null=True, blank=True, max_length=50, choices=Q_CHOICES)
+    question_7 = models.CharField(_("7"),null=True, blank=True, max_length=50, choices=Q_CHOICES)
+    question_8 = models.CharField(_("8"),null=True, blank=True, max_length=50, choices=Q_CHOICES)
+    question_9 = models.CharField(_("9"),null=True, blank=True, max_length=50, choices=Q_CHOICES)
+    question_10= models.CharField(_("10"),null=True, blank=True, max_length=50, choices=Q_CHOICES)
+    question_11= models.CharField(_("11"),null=True, blank=True, max_length=50, choices=Q_CHOICES)
+
+
     def __str__(self):
         return f'{self.patient} --> {self.name}'
     
@@ -62,13 +81,7 @@ class Question(models.Model):
 class Answer(models.Model):
     survey = models.ForeignKey(Survey, verbose_name=_("Survey"),related_name="survey_ans",on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE, null=True,blank=True)
-
-    CHOICES = (
-        ('yes', 'Yes'),
-        ('no', 'No'),
-        ('dont_know', 'Don\'t Know'),
-    )
-    answer_choice = models.CharField(max_length=20, choices=CHOICES)
+    answer_choice = models.CharField(max_length=20, choices=Q_CHOICES)
 
     def __str__(self) -> str:
         return str(self.survey)
@@ -78,7 +91,7 @@ class DoctorConsultationRequest(models.Model):
     doctors = models.ManyToManyField('accounts.Doctor',related_name="doctors_survey_request", blank=True)
     survey = models.OneToOneField(Survey, on_delete=models.CASCADE)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
-    status = models.CharField(_("Status"), max_length=50, choices=CHOICES, default="pending")
+    status = models.CharField(_("Status"), max_length=50, choices=Q_CHOICES, default="pending")
     accepted_doctor = models.ForeignKey(
         'accounts.Doctor',
         blank=True, 

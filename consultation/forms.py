@@ -1,5 +1,5 @@
 from django import forms
-from .models import Question ,Survey, Question,Answer,GENDER
+from .models import Question ,Survey, Question,Answer,GENDER ,Q_CHOICES
 from django.db import transaction
 
     
@@ -8,7 +8,7 @@ class SurveyForm(forms.ModelForm):
         super(SurveyForm, self).__init__(*args, **kwargs)
         for question in (Question.objects.filter(is_active=True)) :
             self.fields[f'Q-{question.id}'] = forms.ChoiceField(
-                                choices=Answer.CHOICES,
+                                choices=Q_CHOICES,
                                 widget=forms.RadioSelect,
                                 label=question.question_text
                                 )
@@ -36,7 +36,7 @@ class QuestionForm(forms.ModelForm):
 
 
 class AnswerForm(forms.ModelForm):
-    answer_choice = forms.ChoiceField(choices=Answer.CHOICES, widget=forms.RadioSelect)
+    answer_choice = forms.ChoiceField(choices=Q_CHOICES, widget=forms.RadioSelect)
 
     class Meta:
         model = Answer
@@ -73,6 +73,7 @@ class QuestionForm(forms.Form):
             answers[field] = self.cleaned_data[field]
         return answers
 '''
+
 class CreateQuestionForm(forms.ModelForm):
     class Meta:
         model = Question

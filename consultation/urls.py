@@ -1,6 +1,11 @@
-from django.urls import path 
+from django.urls import include, path 
+from rest_framework.routers import DefaultRouter
 from . import views , api
+
 app_name = "consultation"
+router = DefaultRouter()
+router.register(r"", api.SurveyViewSet)
+
 urlpatterns = [
     path("", views.survey, name='questions'),
     path("create/", views.create_question, name='create_questions'),
@@ -9,7 +14,7 @@ urlpatterns = [
     path('patient/survey/<int:survey_id>', views.answer_create, name='answer_create'),
 
     #API
-    path('api/create-survey',api.CreateSurveyApi.as_view(), name= "create_survey" )
+    path("api/survey/", include(router.urls)),
 
 
     
