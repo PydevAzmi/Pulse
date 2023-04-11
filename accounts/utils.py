@@ -13,5 +13,5 @@ def jwt_response_payload_handler(token, user=None, request=None):
         return {'token': token, 'user': {'id': user.id, 'username': user.username}, 'redirect_to': '/patient-dashboard/'}
     elif user.is_doctor == True and user.is_hospital == True :
         return {'token': token, 'user': {'id': user.id, 'username': user.username}, 'redirect_to': '/hospital-dashboard/'}
-    elif user.is_superuser == 'admin':
+    elif user.is_superuser :
         return {'token': token, 'user': {'id': user.id, 'username': user.username}, 'redirect_to': '/admin/'}

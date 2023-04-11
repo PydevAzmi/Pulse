@@ -1,6 +1,7 @@
 from django.urls import path ,re_path
 from . import views
 from . import api
+from rest_framework_jwt.views import obtain_jwt_token
 from rest_auth.registration.views import VerifyEmailView
 app_name = "accounts"
 urlpatterns = [
@@ -17,7 +18,8 @@ urlpatterns = [
     path("api/patient-register/",api.PatientRegisterApi.as_view() ,name = "patient_register"),
     path("api/doctor-register/",api.DoctorRegisterationApi.as_view() ,name = "doctor_register"),
     path("api/login/",api.ObtainJWTLoginViewApi.as_view() ,name = "login"),
-    path("api/logout/",api.User_logout ,name = "logout"),
+    path("api/logout/",api.LogoutView.as_view() ,name = "logout"),
+    path('api/token/', obtain_jwt_token),
 
 
 
