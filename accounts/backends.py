@@ -4,9 +4,9 @@ from .models import User
 
 class JWTAuthentication(BaseAuthentication):
     def authenticate(self, request):
+        print("hi")
         jwt_auth = JSONWebTokenAuthentication()
         result = jwt_auth.authenticate(request)
-        print(result)
         if result is None:
             print("Nooon")
             return None
@@ -19,6 +19,5 @@ class JWTAuthentication(BaseAuthentication):
         try:
             return User.objects.get(pk=user_id)
         except User.DoesNotExist:
-            print("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
             return None
        

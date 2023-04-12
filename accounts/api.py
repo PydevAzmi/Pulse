@@ -1,4 +1,5 @@
 from datetime import datetime
+from urllib import response
 from rest_framework_jwt.views import ObtainJSONWebToken 
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_auth.registration.views import RegisterView 
@@ -25,9 +26,9 @@ class ObtainJWTLoginViewApi(ObtainJSONWebToken):
             user = serializer.object.get('user') or request.user
             token = serializer.object.get('token')
             payload = jwt_response_payload_handler(token, user, request)
-
-
             response = Response(payload)
+            response.set_cookie(key='jwt', value=response, httponly=True, max_age=86400)
+
             if api_settings.JWT_AUTH_COOKIE:
                 expiration = (datetime.utcnow() +
                             api_settings.JWT_EXPIRATION_DELTA)
@@ -36,10 +37,10 @@ class ObtainJWTLoginViewApi(ObtainJSONWebToken):
                                     expires=expiration,
                                     httponly=True)
 
-            
             return Response(payload)
         return Response(serializer.errors)
-           
+    
+
 class LogoutView(APIView):
     authentication_classes = (JSONWebTokenAuthentication,)
     permission_classes = [permissions.IsAuthenticated]
