@@ -1,7 +1,7 @@
-from rest_framework import serializers
 from allauth.account.adapter import get_adapter
 from .models import Patient, Doctor ,Hospital 
 from django.contrib.auth import login
+from .models import User
 # For Registeration
 from rest_auth.registration.serializers import RegisterSerializer 
 from django_countries.serializer_fields  import CountryField
@@ -108,7 +108,70 @@ class DoctorRegisterationSerializer(RegisterSerializer):
         )
         doctor.save()
         return user
-    
+
+class UserSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = User
+    fields = ["id", "first_name", "last_name", "username"]
+
+class LoginSerializer(serializers.Serializer):
+
+    username = serializers.CharField(
+        label="Username",
+        write_only=True
+    )
+    password = serializers.CharField(
+        label="Password",
+        # This will be used when the DRF browsable API is enabled
+        style={'input_type': 'password'},
+        trim_whitespace=False,
+        write_only=True
+    )
+
+    def validate(self, attrs):
+        # Take username and password from request
+        username = attrs.get('username')
+        password = attrs.get('password')
+
+        if username and password:
+           
+            user = authenticate(request=self.context.get('request'),
+                                username=username, password=password)
+            if not user:
+                # If we don't have a regular user, raise a ValidationError
+                msg = 'Access denied: wrong username or password.'
+                raise serializers.ValidationError(msg, code='authorization')
+        else:
+            msg = 'Both "username" and "password" are required.'
+            raise serializers.ValidationError(msg, code='authorization')
+        # We have a valid user, put it in the serializer's validated_data.
+        # It will be used in the view.
+        attrs['user'] = user
+        return attrs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
 class LoginJWTSerializer(JSONWebTokenSerializer):
 
     def validate(self, attrs):
@@ -139,3 +202,4 @@ class LoginJWTSerializer(JSONWebTokenSerializer):
             msg = msg.format(username_field=self.username_field)
             raise serializers.ValidationError(msg)
  
+'''
