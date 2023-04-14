@@ -25,7 +25,7 @@ def patient_dir_path(instance, filename):
     return 'patients/{0}/{1}/Scans/{2}'.format(instance.patient, instance.name, filename)
 
 class Review(models.Model):
-    patient = models.ForeignKey('accounts.Patient', verbose_name=_("Patient"), on_delete=models.CASCADE)
+    patient = models.ForeignKey('accounts.User', verbose_name=_("Patient"), on_delete=models.CASCADE)
     doctor = models.ForeignKey('accounts.Doctor', related_name="doctor_reviews", verbose_name=_("Doctor"),null=True, blank=True, on_delete=models.SET_NULL)
     hospital = models.ForeignKey('accounts.Hospital', related_name="hospital_reviews", verbose_name=_("Hospital"),null=True, blank=True, on_delete=models.SET_NULL)
     rate = models.IntegerField(_("Rate"), validators=[maxx_length(5), minn_length(0)])
