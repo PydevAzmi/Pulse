@@ -10,7 +10,6 @@ class IsPatientOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-
         return obj.patient == request.user
 
 
@@ -25,4 +24,4 @@ class IsDoctorOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        return obj.patient == request.user
+        return obj.doctor == request.user

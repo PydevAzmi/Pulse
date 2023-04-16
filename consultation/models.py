@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MaxValueValidator as maxx_length, MinValueValidator as minn_length
 from django.utils.translation import gettext as _
 from django.utils import timezone
+import datetime
 # Create your models here.
 
 Q_CHOICES = (
@@ -33,7 +34,7 @@ class Review(models.Model):
     created_at =models.DateTimeField(_("created at"), default=timezone.now )
 
     def __str__(self):
-        return f'{self.patient.user.username} rated {self.doctor.user.username}'
+        return f'{self.patient.username} rated {self.doctor.username}'
     
 class Survey(models.Model):
     name = models.CharField(_("Patient Name"),null=True, blank=True, max_length=50)
@@ -51,6 +52,7 @@ class Survey(models.Model):
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     completed = models.BooleanField(_("Completed"),default=False)
 
+
     ## Questions 
     question_1 = models.CharField(_("1"),null=True, blank=True, max_length=50, choices=Q_CHOICES)
     question_2 = models.CharField(_("2"),null=True, blank=True, max_length=50, choices=Q_CHOICES)
@@ -64,7 +66,7 @@ class Survey(models.Model):
     question_10= models.CharField(_("10"),null=True, blank=True, max_length=50, choices=Q_CHOICES)
     question_11= models.CharField(_("11"),null=True, blank=True, max_length=50, choices=Q_CHOICES)
 
-
+   
     def __str__(self):
         return f'{self.patient} --> {self.name}'
     
@@ -119,3 +121,14 @@ class HospitalConsultationRequest(models.Model):
 
     def __str__(self):
         return f'{self.survey.patient} - {self.created_at}'
+    
+class Report(models.Model):
+    doctor = models.ForeignKey("accounts.User",related_name="doctor_report", on_delete=models.SET_NULL, null=True, blank=True)
+   #patient = models.ForeignKey("accounts.User", verbose_name=_("Patient"), on_delete=models.CASCADE)
+    survey = models.ForeignKey(Survey, related_name=("survey"), on_delete=models.CASCADE)
+    diagnosis = models.CharField(max_length=50)
+    report_content = models.TextField()
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    
+    def __str__(self):
+        return f'{self.doctor}'

@@ -1,30 +1,25 @@
+from django.shortcuts import get_object_or_404
+from requests import Response
 from . import serializers
 from rest_framework import permissions, viewsets
-from .models import Survey,Review
-from .permissions import IsPatientOrReadOnly
+from .models import Survey,Review,Report
+from .permissions import IsPatientOrReadOnly ,IsDoctorOrReadOnly
 
 
 class SurveyViewSet(viewsets.ModelViewSet):
     """
     CRUD Survey
     """
+
     queryset = Survey.objects.all()
-
-    # In order to use different serializers for different 
-    # actions, you can override the 
-    # get_serializer_class(self) method
-
     def get_serializer_class(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
             return serializers.SurveyWriteSerializer
         return serializers.SurveyReadSerializer
-
-    # get_permissions(self) method helps you separate 
-    # permissions for different actions inside the same view.
     
     def get_permissions(self):
         if self.action in ("create",):
-            self.permission_classes = (permissions.IsAuthenticated , IsPatientOrReadOnly)
+            self.permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsPatientOrReadOnly )
         elif self.action in ("update", "partial_update", "destroy"):
             self.permission_classes = (IsPatientOrReadOnly,)
         else:
@@ -33,7 +28,7 @@ class SurveyViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     """
-    CRUD Survey
+    CRUD Review
     """
     queryset = Review.objects.all()
 
@@ -58,3 +53,38 @@ class ReviewViewSet(viewsets.ModelViewSet):
         else:
             self.permission_classes = (permissions.AllowAny,)
         return super().get_permissions()
+
+class ReportViewSet(viewsets.ModelViewSet):
+    """
+    CRUD Report
+    """
+    
+    # In order to use different serializers for different 
+    # actions, you can override the 
+    # get_serializer_class(self) method
+
+    def get_queryset(self):
+        survey_id = self.kwargs['survey_id']
+        queryset = Report.objects.filter(survey=survey_id)
+        return queryset
+    
+    def get_serializer_class(self):
+        if self.action in ("create", "update", "partial_update", "destroy"):
+            return serializers.ReportWriteSerializer
+        return serializers.ReportReadSerializer
+
+    # get_permissions(self) method helps you separate 
+    # permissions for different actions inside the same view.
+        
+    def get_permissions(self):
+        if self.action in ("create",):
+            self.permission_classes = (permissions.IsAuthenticated ,IsDoctorOrReadOnly )
+        elif self.action in ("update", "partial_update", "destroy"):
+            self.permission_classes = (IsDoctorOrReadOnly)
+        else:
+            self.permission_classes = (permissions.AllowAny,)
+        return super().get_permissions()
+    
+    def perform_create(self, serializer):
+        survey_id = self.kwargs['survey_id']
+        serializer.save(doctor=self.request.user, survey = Survey.objects.get(id=survey_id))

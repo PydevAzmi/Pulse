@@ -5,8 +5,10 @@ from . import views , api
 app_name = "consultation"
 
 router = DefaultRouter()
-router.register(r"survey", api.SurveyViewSet)
-router.register(r"review", api.ReviewViewSet)
+router.register(r"survey", api.SurveyViewSet, basename="survey")
+router.register(r"review", api.ReviewViewSet, basename="reviews")
+router.register(r'survey/(?P<survey_id>\d+)/reports', api.ReportViewSet, basename="survey:another")
+
 
 
 urlpatterns = [
