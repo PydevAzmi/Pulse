@@ -12,6 +12,9 @@ class SurveyViewSet(viewsets.ModelViewSet):
     """
 
     queryset = Survey.objects.all()
+
+    serializer_class = serializers.SurveyReadSerializer
+
     def get_serializer_class(self):
         if self.action in ("create", "update", "partial_update", "destroy"):
             return serializers.SurveyWriteSerializer
@@ -19,12 +22,18 @@ class SurveyViewSet(viewsets.ModelViewSet):
     
     def get_permissions(self):
         if self.action in ("create",):
-            self.permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsPatientOrReadOnly )
+            self.permission_classes = (permissions.IsAuthenticatedOrReadOnly,IsPatientOrReadOnly )
         elif self.action in ("update", "partial_update", "destroy"):
-            self.permission_classes = (IsPatientOrReadOnly,)
+            self.permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
         else:
             self.permission_classes = (permissions.AllowAny,)
         return super().get_permissions()
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(user=self.request.user)
 
 class ReviewViewSet(viewsets.ModelViewSet):
     """
@@ -62,7 +71,6 @@ class ReportViewSet(viewsets.ModelViewSet):
     # In order to use different serializers for different 
     # actions, you can override the 
     # get_serializer_class(self) method
-
     def get_queryset(self):
         survey_id = self.kwargs['survey_id']
         queryset = Report.objects.filter(survey=survey_id)
@@ -77,14 +85,24 @@ class ReportViewSet(viewsets.ModelViewSet):
     # permissions for different actions inside the same view.
         
     def get_permissions(self):
-        if self.action in ("create",):
-            self.permission_classes = (permissions.IsAuthenticated ,IsDoctorOrReadOnly )
-        elif self.action in ("update", "partial_update", "destroy"):
-            self.permission_classes = (IsDoctorOrReadOnly)
+        if self.action == "create":
+            permission_classes = [permissions.IsAuthenticated, IsDoctorOrReadOnly]
+        elif self.action in ["update", "partial_update", "destroy"]:
+            permission_classes = [IsDoctorOrReadOnly]
         else:
-            self.permission_classes = (permissions.AllowAny,)
-        return super().get_permissions()
-    
+            permission_classes = [permissions.AllowAny]
+        return [permission() for permission in permission_classes]
+        
     def perform_create(self, serializer):
         survey_id = self.kwargs['survey_id']
         serializer.save(doctor=self.request.user, survey = Survey.objects.get(id=survey_id))
+
+    def perform_update(self, serializer):
+        survey_id = self.kwargs['survey_id']
+        serializer.save(doctor=self.request.user, survey = Survey.objects.get(id=survey_id))
+        
+    def perform_destroy(self, instance):
+        survey_id = self.kwargs['survey_id']
+        instance.doctor = self.request.user
+        instance.survey = Survey.objects.get(id=survey_id)
+        instance.save()
