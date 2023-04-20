@@ -1,16 +1,16 @@
 from allauth.account.adapter import get_adapter
-from .models import Patient, Doctor ,Hospital 
+from .models import Patient, Doctor, Hospital, User
 from django.contrib.auth import login
-from .models import User
 # For Registeration
 from rest_auth.registration.serializers import RegisterSerializer 
 from django_countries.serializer_fields  import CountryField
 
 # for Login & Logout
 from django.contrib.auth import authenticate, user_logged_in
-from rest_framework import serializers
+from rest_framework import serializers 
 from rest_framework_jwt.serializers import JSONWebTokenSerializer
 from rest_framework_jwt.utils import jwt_encode_handler, jwt_payload_handler
+from consultation.serializers import ReviewReadSerializer, ReportReadSerializer
 
 GENDER = {
     'Male': 'Male',
@@ -107,12 +107,7 @@ class DoctorRegisterationSerializer(RegisterSerializer):
         )
         doctor.save()
         return user
-
-class UserSerializer(serializers.ModelSerializer):
-  class Meta:
-    model = User
-    fields = ["id", "first_name", "last_name", "username"]
-
+    
 class LoginSerializer(serializers.Serializer):
 
     username = serializers.CharField(
@@ -149,13 +144,35 @@ class LoginSerializer(serializers.Serializer):
         return attrs
 
 
+        
+class UserSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = User
+    fields = ['id', 'first_name', 'last_name', 'email']
 
+class HospitalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hospital
+        fields = ['id',"name"]
 
+class DoctorSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    hospital =HospitalSerializer(read_only= True)
+    review = ReviewReadSerializer(read_only = True)
+    class Meta:
+        model = Doctor
+        fields = "__all__"
 
+class PatientSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    class Meta:
+        model = Patient
+        fields = "__all__"
 
-
-
-
+class UserUpdateSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = User
+    fields = "__all__"
 
 
 
