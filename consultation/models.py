@@ -34,7 +34,7 @@ class Review(models.Model):
     created_at =models.DateTimeField(_("created at"), default=timezone.now )
 
     def __str__(self):
-        return f'{self.patient.username} rated {self.doctor.username}'
+        return f'{self.patient} rated {self.doctor}'
     
 class Survey(models.Model):
     name = models.CharField(_("Patient Name"),null=True, blank=True, max_length=50)
