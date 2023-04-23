@@ -1,14 +1,13 @@
 from django.urls import include, path 
 from rest_framework.routers import DefaultRouter
-from . import views , api
+from . import views, api
 
 app_name = "consultation"
 
 router = DefaultRouter()
 router.register(r"survey", api.SurveyViewSet, basename="survey")
 router.register(r"review", api.ReviewViewSet, basename="reviews")
-router.register(r'survey/(?P<survey_id>\d+)/reports', api.ReportViewSet, basename="survey:another")
-
+router.register(r'survey/(?P<survey_id>\d+)/reports', api.ReportViewSet, basename="survey_report")
 
 
 urlpatterns = [
