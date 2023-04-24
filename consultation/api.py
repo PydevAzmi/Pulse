@@ -44,8 +44,8 @@ class SurveyViewSet(viewsets.ModelViewSet):
         serializer.save(patient=self.request.user)
 
         # Load machine learning models
-        ecgmodel = load_model('ECGmodel.h5')
-        mrimodel = load_model('MRI MODEL.h5')
+        ecgmodel = load_model('ECG_MODEL.h5')
+        mrimodel = load_model('MRI_MODEL.h5')
 
         # Retrieve survey data and image from request
         survey_data = serializer.validated_data
@@ -61,14 +61,19 @@ class SurveyViewSet(viewsets.ModelViewSet):
         ecg_image = np.expand_dims(ecg_image, axis=0)
 
         mri_image = Image.open(mri_image)
+        mri_image = mri_image.convert("RGB")
         mri_image = mri_image.resize((224, 224))
-        mri_image = np.array(mri_image) / 255.0
+        mri_image = np.array(mri_image) 
         mri_image = np.expand_dims(mri_image, axis=0)
+
 
         # Use model to make predictions on image data
         mri_prediction = mrimodel.predict(mri_image)
-        ecg_prediction = ecgmodel.predict(ecg_image)
+        print(f"MRI : {mri_prediction}")
 
+        ecg_prediction = ecgmodel.predict(ecg_image)
+        print(f"MRI : {mri_prediction}")
+        
         # Create new instance of MLModelResult and save to database
         result = MLModel(   survey=serializer.instance,
                             mri_diagnosis = str(mri_prediction),
