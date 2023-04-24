@@ -8,6 +8,7 @@ router = DefaultRouter()
 router.register(r"survey", api.SurveyViewSet, basename="survey")
 router.register(r"review", api.ReviewViewSet, basename="reviews")
 router.register(r'survey/(?P<survey_id>\d+)/reports', api.ReportViewSet, basename="survey_report")
+router.register(r'survey/(?P<survey_id>\d+)/intial-diagnosis', api.MLModelViewSet, basename="survey_diagnosis")
 
 
 urlpatterns = [

@@ -132,3 +132,11 @@ class Report(models.Model):
     
     def __str__(self):
         return f'{self.doctor}'
+
+class MLModel(models.Model):
+    survey = models.ForeignKey(Survey, related_name=("ml_survey"), on_delete=models.CASCADE)
+    ecg_diagnosis = models.CharField(max_length=50)
+    mri_diagnosis = models.CharField(max_length=50)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    def __str__(self) -> str:
+        return f'{self.survey}> {self.mri_diagnosis}, {self.ecg_diagnosis}'

@@ -1,8 +1,17 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from .models import Survey, Review  ,Report
+from .models import Survey, Review  ,Report,MLModel
 from accounts.models import Patient,User
 
+class MLmodelWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MLModel
+        exclude = ['created_at','survey']
+
+class MLmodelReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MLModel
+        fields = '__all__'
 
 class ReportWriteSerializer(serializers.ModelSerializer):
     doctor = serializers.HiddenField(default=serializers.CurrentUserDefault())
@@ -18,6 +27,7 @@ class ReportReadSerializer(serializers.ModelSerializer):
         
 class SurveyWriteSerializer(serializers.ModelSerializer):
     reports = ReportReadSerializer(many = True, read_only = True)
+    ml_models = MLmodelReadSerializer(many = True, read_only = True)
     patient = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model = Survey
