@@ -1,0 +1,7 @@
+tensorflow
+google-colab==1.0.0
+keras==2.6.0
+matplotlib==3.5.1
+tqdm==4.62.3
+opencv-python==4.5.4.58
+scikit-learn==1.1.0
