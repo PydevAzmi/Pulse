@@ -1,7 +1,31 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from .models import Survey, Review  ,Report,MLModel
-from accounts.models import Patient,User
+from .models import Survey, Review, Report, MLModel, Consultation
+from accounts.models import Patient, User, Doctor,Hospital
+
+
+class HospitalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hospital
+        fields = ['id',"name"]
+
+class DoctorSerializer(serializers.ModelSerializer):
+    hospital =HospitalSerializer(read_only= True)
+    class Meta:
+        model = Doctor
+        fields = ('id', 'user', 'hospital', 'specialist', 'profile_photo', 'exp', 'fee')
+
+class ReviewWriteSerializer(serializers.ModelSerializer):
+    patient = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    class Meta:
+        model = Review
+        exclude = ['created_at',]
+
+class ReviewReadSerializer(serializers.ModelSerializer):
+    patient = serializers.CharField(source="patient.id", read_only=True)
+    class Meta:
+        model = Review
+        fields =  '__all__'
 
 class MLmodelWriteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,6 +44,7 @@ class ReportWriteSerializer(serializers.ModelSerializer):
         exclude = ['created_at','survey']
 
 class ReportReadSerializer(serializers.ModelSerializer):
+    reviews = ReviewWriteSerializer(read_only=True)
     doctor = serializers.CharField(source="doctor.id", read_only=True)
     class Meta:
         model = Report
@@ -39,15 +64,8 @@ class SurveyReadSerializer(serializers.ModelSerializer):
         model = Survey
         fields = '__all__'
 
-class ReviewWriteSerializer(serializers.ModelSerializer):
+class ConsultationSerializer(serializers.ModelSerializer):
     patient = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
-        model = Review
-        exclude = ['created_at',]
-
-class ReviewReadSerializer(serializers.ModelSerializer):
-    patient = serializers.CharField(source="patient.id", read_only=True)
-    class Meta:
-        model = Review
-        fields =  '__all__'
-
+        model = Consultation
+        exclude = ['created_at','status','survey']

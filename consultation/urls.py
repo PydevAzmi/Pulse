@@ -6,8 +6,9 @@ app_name = "consultation"
 
 router = DefaultRouter()
 router.register(r"survey", api.SurveyViewSet, basename="survey")
-router.register(r"review", api.ReviewViewSet, basename="reviews")
 router.register(r'survey/(?P<survey_id>\d+)/reports', api.ReportViewSet, basename="survey_report")
+router.register(r'survey/(?P<survey_id>\d+)/consult', api.ConsultationViewSet, basename="survey_doc")
+router.register(r'survey/(?P<survey_id>\d+)/reports/(?P<report_id>\d+)/review', api.ReviewViewSet, basename="report_review")
 router.register(r'survey/(?P<survey_id>\d+)/intial-diagnosis', api.MLModelViewSet, basename="survey_diagnosis")
 
 
@@ -20,4 +21,5 @@ urlpatterns = [
 
     #API
     path("api/", include(router.urls)),
+    path('api/doctors/', api.DoctorListView.as_view(), name='doctor-list'),
 ]
