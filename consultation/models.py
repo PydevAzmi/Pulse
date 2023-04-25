@@ -15,20 +15,24 @@ GENDER = [
         ('Female', 'Female'),
     ]
 
+CONSULTATION_STATUS_CHOICES = [
+    ("pending","pending"),
+    ("accepted", "accepted"),
+    ("rejected","rejeted"),
+]
 CHOICES = [
     ("pending","pending"),
     ("accepted", "accepted"),
     ("rejected","rejeted"),
 ]
 
-
 def patient_dir_path(instance, filename):
     return 'patients/{0}/{1}/Scans/{2}'.format(instance.patient, instance.name, filename)
 
 class Review(models.Model):
-    patient = models.ForeignKey('accounts.User', verbose_name=_("Patient"), on_delete=models.CASCADE)
-    doctor = models.ForeignKey('accounts.Doctor', related_name="doctor_reviews", verbose_name=_("Doctor"),null=True, blank=True, on_delete=models.SET_NULL)
-    hospital = models.ForeignKey('accounts.Hospital', related_name="hospital_reviews", verbose_name=_("Hospital"),null=True, blank=True, on_delete=models.SET_NULL)
+    patient = models.ForeignKey('accounts.Patient', verbose_name=_("Patient"), on_delete=models.CASCADE)
+    doctor = models.ForeignKey('accounts.Doctor', related_name="doctor", verbose_name=_("Doctor"),null=True, blank=True, on_delete=models.SET_NULL)
+    hospital = models.ForeignKey('accounts.Hospital', related_name="hospital", verbose_name=_("Hospital"),null=True, blank=True, on_delete=models.SET_NULL)
     rate = models.IntegerField(_("Rate"), validators=[maxx_length(5), minn_length(0)])
     review = models.TextField(_("Review"), max_length=500)
     created_at =models.DateTimeField(_("created at"), default=timezone.now )
@@ -40,18 +44,22 @@ class Survey(models.Model):
     name = models.CharField(_("Patient Name"),null=True, blank=True, max_length=50)
     age = models.IntegerField(_("Age"),validators=[maxx_length(100), minn_length(1)], null=True, blank=True)
     date_of_birth = models.DateField(default=None, null=True ,blank=True)
-    gender = models.CharField(_("Gender"), null=True, blank=True,max_length=50, choices=GENDER)
-    patient = models.ForeignKey('accounts.User', on_delete=models.CASCADE, null=True ,blank=True)
-    #questions = models.ManyToManyField("Question",related_name="survey_questions" ,verbose_name=_("Questions"))
-    #answers = models.ManyToManyField("Answer", related_name=_("survey_answers"),verbose_name=_("Answers"))
+    gender = models.CharField(_("Gender"), null=True, blank=True, max_length=50, choices=GENDER)
+    patient = models.ForeignKey('accounts.Patient', on_delete=models.CASCADE, null=True ,blank=True)
+    '''
+    doctor = models.ForeignKey('accounts.Doctor', on_delete=models.CASCADE, null=True ,blank=True)
+    hospital = models.ForeignKey('accounts.Hospital', on_delete=models.CASCADE, null=True ,blank=True)
+    '''
     mri =models.ImageField(_("MRI"), upload_to=patient_dir_path) 
     ct = models.ImageField(_("CT"), upload_to=patient_dir_path)
     ecg = models.ImageField(_("ECG"), upload_to=patient_dir_path)
-    title = models.CharField(_("Tiltle"),max_length=200)
+    title = models.CharField(_("Title"),max_length=200)
     description = models.TextField(_("Description"),null=True, blank=True)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     completed = models.BooleanField(_("Completed"),default=False)
 
+    #questions = models.ManyToManyField("Question",related_name="survey_questions" ,verbose_name=_("Questions"))
+    #answers = models.ManyToManyField("Answer", related_name=_("survey_answers"),verbose_name=_("Answers"))
 
     ## Questions 
     question_1 = models.CharField(_("1"),null=True, blank=True, max_length=50, choices=Q_CHOICES)
@@ -70,7 +78,6 @@ class Survey(models.Model):
     def __str__(self):
         return f'{self.patient} --> {self.name}'
     
-
 class Question(models.Model):
     question_text = models.TextField(_("Question"))
     category = models.CharField(_("Questions Category"), max_length=50, null=True,blank=True)
@@ -79,7 +86,6 @@ class Question(models.Model):
     def __str__(self):
         return self.question_text
 
-
 class Answer(models.Model):
     survey = models.ForeignKey(Survey, verbose_name=_("Survey"),related_name="survey_ans",on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE, null=True,blank=True)
@@ -87,7 +93,6 @@ class Answer(models.Model):
 
     def __str__(self) -> str:
         return str(self.survey)
-
 
 class DoctorConsultationRequest(models.Model):
     doctors = models.ManyToManyField('accounts.Doctor',related_name="doctors_survey_request", blank=True)
@@ -104,7 +109,7 @@ class DoctorConsultationRequest(models.Model):
 
     def __str__(self):
         return f'{self.survey.patient} - {self.created_at}'
-    
+
 class HospitalConsultationRequest(models.Model):
     doctors = models.ManyToManyField('accounts.Hospital',related_name="Hospital_survey_request", blank=True)
     survey = models.OneToOneField(Survey, on_delete=models.CASCADE)
@@ -121,9 +126,9 @@ class HospitalConsultationRequest(models.Model):
 
     def __str__(self):
         return f'{self.survey.patient} - {self.created_at}'
-    
+
 class Report(models.Model):
-    doctor = models.ForeignKey("accounts.User",related_name="doctor_report", on_delete=models.SET_NULL, null=True, blank=True)
+    doctor = models.ForeignKey("accounts.Doctor",related_name="doctor_report", on_delete=models.SET_NULL, null=True, blank=True)
    #patient = models.ForeignKey("accounts.User", verbose_name=_("Patient"), on_delete=models.CASCADE)
     survey = models.ForeignKey(Survey, related_name=("survey"), on_delete=models.CASCADE)
     diagnosis = models.CharField(max_length=50)
@@ -140,3 +145,14 @@ class MLModel(models.Model):
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     def __str__(self) -> str:
         return f'{self.survey}> {self.mri_diagnosis}, {self.ecg_diagnosis}'
+
+class Consultation(models.Model):
+    patient = models.ForeignKey('accounts.Patient', on_delete=models.CASCADE)
+    doctors = models.ManyToManyField('accounts.Doctor', related_name='consultations')
+    survey = models.ForeignKey('Survey', on_delete=models.CASCADE)
+    status = models.CharField(max_length=50, choices=CONSULTATION_STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("Consultation")
+        verbose_name_plural = _("Consultations")
