@@ -11,6 +11,12 @@
     <h1>Welcome!!</h1>
     {% if request.user.is_authenticated %}
         <li><a href="{% url 'accounts:Logout' %}">Log Out</a></li>
+        <li>username : {{request.user}}</li>
+        {% if request.user.is_doctor %}
+        <h3><li>Doctor</li></h3> 
+        {% elif request.user.is_patient %}
+        <h3><li>Patient</li></h3> 
+        {% endif %}
     {% else %}
         <li><a href="{% url 'accounts:Login' %}">Login</a></li> 
         <li><a href="{% url 'accounts:Register' %}">register</a></li> 
