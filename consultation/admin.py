@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import (Review, Survey, Answer, Report, MLModel,
+from .models import (Review, Survey, Answer, Report, MLModel, Consultation,
                      HospitalConsultationRequest, DoctorConsultationRequest,
                      Question, Answer)
 # Register your models here.
@@ -28,6 +28,7 @@ class SurveyReportMLInlines(admin.ModelAdmin):
     ]
 
 admin.site.register(Review)
+admin.site.register(Consultation)
 admin.site.register(MLModel)
 admin.site.register(Report)
 admin.site.register(Question,QuesAswers)

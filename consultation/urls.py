@@ -6,8 +6,9 @@ app_name = "consultation"
 
 router = DefaultRouter()
 router.register(r"survey", api.SurveyViewSet, basename="survey")
+router.register(r"requests", api.ConsultationRequestViewSet, basename="survey_requests")
 router.register(r'survey/(?P<survey_id>\d+)/reports', api.ReportViewSet, basename="survey_report")
-router.register(r'survey/(?P<survey_id>\d+)/consult', api.ConsultationViewSet, basename="survey_doc")
+router.register(r'survey/(?P<survey_id>\d+)/requests', api.ConsultationRequestViewSet, basename="survey_doc")
 router.register(r'survey/(?P<survey_id>\d+)/reports/(?P<report_id>\d+)/review', api.ReviewViewSet, basename="report_review")
 router.register(r'survey/(?P<survey_id>\d+)/intial-diagnosis', api.MLModelViewSet, basename="survey_diagnosis")
 

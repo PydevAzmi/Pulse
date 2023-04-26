@@ -64,8 +64,19 @@ class SurveyReadSerializer(serializers.ModelSerializer):
         model = Survey
         fields = '__all__'
 
-class ConsultationSerializer(serializers.ModelSerializer):
+class SurveyRead_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Survey
+        fields = '__all__'
+
+class ConsultationPatientSerializer(serializers.ModelSerializer):
     patient = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model = Consultation
-        exclude = ['created_at','status','survey']
+        exclude = ['created_at','survey']
+
+class ConsultationDoctorSerializer(serializers.ModelSerializer):
+    survey =SurveyRead_Serializer(read_only = True)
+    class Meta:
+        model = Consultation
+        fields = ['id', 'status', 'created_at', 'survey']

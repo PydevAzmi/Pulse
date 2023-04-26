@@ -1,11 +1,11 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404 
 from requests import Response
 from . import serializers
-from rest_framework import permissions, viewsets, generics
+from rest_framework import permissions, viewsets, generics ,status
 from .models import Survey,Review,Report,MLModel, Consultation
 from accounts.models import Doctor, Patient
-from .permissions import IsPatientOrReadOnly ,IsDoctorOrReadOnly
-
+from .permissions import IsPatientOrReadOnly ,IsDoctorOrReadOnly, IsPatientOrDoctor
+from rest_framework.exceptions import ValidationError
 # For ML
 from keras.models import load_model
 import numpy as np
@@ -24,7 +24,15 @@ class SurveyViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_authenticated and user.is_patient:
             patient = Patient.objects.get(user = user)
-            return Survey.objects.filter(patient=patient)      
+            return Survey.objects.filter(patient=patient)
+        elif user.is_authenticated and user.is_doctor:
+            doctor = Doctor.objects.get(user = user)
+            doctor_request = Consultation.objects.get(doctors=doctor)
+            if doctor_request.status == "accepted" :
+                survey = doctor_request.survey.id
+                return Survey.objects.filter(id=survey)
+            else:
+                return Survey.objects.none() 
         else:
             return Survey.objects.none() 
 
@@ -126,7 +134,13 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         report_id = self.kwargs['report_id']
         report = Report.objects.get(id=report_id)
-        serializer.save(patient=self.request.user, doctor = report.doctor )
+        patient = Patient.objects.get(user = self.request.user)
+        
+        existing_review = Review.objects.filter(patient=patient, doctor = report.doctor).exists()
+        if existing_review:
+            raise ValidationError('You can only create one consultation request for a single survey.')
+        else:
+            serializer.save(patient=patient, doctor = report.doctor )
 
     def perform_update(self, serializer):
         report_id = self.kwargs['report_id']
@@ -161,7 +175,11 @@ class ReportViewSet(viewsets.ModelViewSet):
         survey_id = self.kwargs['survey_id']
         doctor = Doctor.objects.get(user = self.request.user)
         survey = Survey.objects.get(id=survey_id)
-        serializer.save(doctor=doctor, survey = survey)
+        existing_report = Report.objects.filter(doctor=doctor, survey = survey).exists()
+        if existing_report:
+            raise ValidationError('You can only create one report for a single survey.')
+        else:
+            serializer.save(doctor=doctor, survey = survey)
 
     def perform_update(self, serializer):
         survey_id = self.kwargs['survey_id']
@@ -204,35 +222,59 @@ class DoctorListView(generics.ListAPIView):
             queryset = queryset.filter(specialist__icontains=specialist)
         return queryset
 
-class ConsultationViewSet(viewsets.ModelViewSet):
+class ConsultationRequestViewSet(viewsets.ModelViewSet):
     queryset = Consultation.objects.all()
-    serializer_class = serializers.ConsultationSerializer
     permission_classes = (permissions.IsAuthenticated, IsPatientOrReadOnly)
 
-     # for only the user who loged in
+    # for only the user who loged in
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated and user.is_patient:
             patient = Patient.objects.get(user = user)
-            return Consultation.objects.filter(patient=patient)      
+            return Consultation.objects.filter(patient=patient)
+        elif user.is_authenticated and user.is_doctor:
+            doctor = Doctor.objects.get(user = user)
+            return Consultation.objects.filter(doctors=doctor).select_related("survey")
         else:
             return Consultation.objects.none() 
         
+    def get_serializer_class(self):
+        user = self.request.user
+        if self.action in ("create", "destroy" ):
+            return serializers.ConsultationPatientSerializer
+        elif self.action in ('update',"partial_update",'retrieve' ):
+            if user.is_authenticated and user.is_patient:
+                print("patient")
+                return serializers.ConsultationPatientSerializer
+            elif user.is_authenticated and user.is_doctor:
+                print("doctor")
+                return serializers.ConsultationDoctorSerializer
+        else:
+            return serializers.ConsultationPatientSerializer
+
+    
     def get_permissions(self):
         if self.action in ("create",):
             self.permission_classes = (permissions.IsAuthenticated, IsPatientOrReadOnly )
-        elif self.action in ("update", "partial_update", "destroy"):
-            self.permission_classes = (IsPatientOrReadOnly,)
+        elif self.action in ( "partial_update",):
+            self.permission_classes = (IsPatientOrDoctor, )
+        elif self.action in ("update", "destroy"):
+            self.permission_classes = (IsPatientOrReadOnly, )
         else:
             self.permission_classes = (permissions.AllowAny,)
 
         return super().get_permissions()
     
     def perform_create(self, serializer):
+        # Check if consultation request already exists for the patient
+        patient = Patient.objects.get(user = self.request.user)
         survey_id = self.kwargs['survey_id']
         survey = Survey.objects.get(id = survey_id)
-        patient = Patient.objects.get(user = self.request.user)
-        serializer.save(patient=patient, survey = survey, )
+        existing_consultation_request = Consultation.objects.filter(patient=patient, survey = survey).exists()
+        if existing_consultation_request:
+            raise ValidationError('You can only create one consultation request for a single survey.')
+        else:
+            serializer.save(patient=patient, survey = survey, )
 
     def perform_update(self, serializer):
         survey_id = self.kwargs['survey_id']

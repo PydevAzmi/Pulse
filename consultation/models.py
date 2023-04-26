@@ -149,10 +149,10 @@ class MLModel(models.Model):
 class Consultation(models.Model):
     patient = models.ForeignKey('accounts.Patient', on_delete=models.CASCADE)
     doctors = models.ManyToManyField('accounts.Doctor', related_name='consultations')
-    survey = models.ForeignKey('Survey', on_delete=models.CASCADE)
+    survey = models.ForeignKey('Survey',related_name=("survey_request"), on_delete=models.CASCADE)
     status = models.CharField(max_length=50, choices=CONSULTATION_STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = _("Consultation")
+        verbose_name = _("Consultation Requests")
         verbose_name_plural = _("Consultations")
