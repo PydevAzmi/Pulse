@@ -52,7 +52,7 @@ scipy==1.10.1
 six==1.16.0
 sqlparse==0.4.3
 
-tensorflow-cpu==2.7.0 --global-option="build_ext" --global-option="--copt=-mavx2" --global-option="--copt=-mfma"
+tensorflow-cpu==2.7.0 
 
 termcolor==2.3.0
 threadpoolctl==3.1.0
