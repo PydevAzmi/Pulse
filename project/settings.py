@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-85rx&vrcl9ikf=8mmza@(dkyqv%beqs*8h56eg#c&(r8pufkl4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.railway.app']
+ALLOWED_HOSTS = ['.railway.app','127.0.0.1']
 
 
 # Application definition
@@ -174,6 +174,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://\w+\.domain\.com$",
+    r"^https://\w+\.domain\.app$"
 ]
 
 # if wants to limits what methods are allowed for CORS
@@ -209,7 +210,7 @@ REST_FRAMEWORK = {
 
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-         ]
+        ]
 }
 
 
