@@ -9,6 +9,7 @@ from rest_framework.exceptions import ValidationError
 # For ML
 from keras.models import load_model
 import numpy as np
+import tensorflow as tf
 
 class SurveyViewSet(viewsets.ModelViewSet):
     """
@@ -60,7 +61,7 @@ class SurveyViewSet(viewsets.ModelViewSet):
 
         # Define class labels
         ecg_labels = {0: "normal", 1: "abnormal"}
-        mri_labels = {0: "normal", 1: "abnormal"}
+        mri_labels = {1: "normal", 0: "abnormal"}
 
         # Retrieve survey data and image from request
         survey_data = serializer.validated_data
@@ -70,31 +71,35 @@ class SurveyViewSet(viewsets.ModelViewSet):
         from PIL import Image
         # Preprocess the image as required by the model
         # resize to (224, 224) and normalize pixel values
+
+        mri_image = tf.keras.preprocessing.image.img_to_array(mri_img)
+        mri_image = mri_image / 255.0
+        mri_image = tf.expand_dims(mri_image, axis=0)
+
+
         ecg_image = Image.open(ecg_image)
         ecg_image = ecg_image.convert("RGB")
         ecg_image = ecg_image.resize((224, 224))
         ecg_image = np.array(ecg_image) / 255.0
         ecg_image = np.expand_dims(ecg_image, axis=0)
 
-        mri_image = Image.open(mri_image)
-        mri_image = mri_image.resize((224, 224))
-        mri_image = np.array(mri_image)
-        mri_image = np.expand_dims(mri_image, axis=0)
 
-        # Use model to make predictions on image data
-        """
-        mri_prediction = mrimodel.predict(mri_image).argmax(axis=1)
-        mri_prediction = mri_labels[mri_prediction[0]]"""
+
+        # Load the image you want to classify
+        mri_img = tf.keras.preprocessing.image.load_img(mri_image, target_size=(224, 224))
+
+        # Preprocess the image
+        mri_prediction = mrimodel.predict(mri_image).argmax(axis = 1)
+        mri_prediction = mri_labels[mri_prediction[0]]
+
         ecg_prediction = ecgmodel.predict(ecg_image)
-        print(f'result : without argmax {ecg_prediction}')
         ecg_prediction = ecg_prediction.argmax(axis = 1)
-        print(f'result : with argmax {ecg_prediction}')
         ecg_prediction = ecg_labels[ecg_prediction[0]]
 
         # Create new instance of MLModelResult and save to database
         result = MLModel(   survey=serializer.instance,
-                            mri_diagnosis = 'mri_prediction',
-                            ecg_diagnosis =  ecg_prediction)
+                            mri_diagnosis = mri_prediction,
+                            ecg_diagnosis = ecg_prediction)
         result.save()
         
 
