@@ -14,7 +14,8 @@ from .serializers import (  LoginSerializer,
                             DoctorRegisterationSerializer,
                             DoctorSerializer,
                             PatientSerializer,
-                            UserUpdateSerializer)
+                            UserUpdateSerializer,
+                            HospitalAdminSignUpSerializer)
 
 
 
@@ -23,6 +24,10 @@ class PatientRegisterApi(RegisterView):
 
 class DoctorRegisterationApi(RegisterView):
     serializer_class = DoctorRegisterationSerializer
+
+class HospitalAdminRegisterApi(RegisterView):
+    permission_classes = [permissions.IsAdminUser]
+    serializer_class = HospitalAdminSignUpSerializer
 
 class LoginViewApi(views.APIView):
     # This view should be accessible also for unauthenticated users.

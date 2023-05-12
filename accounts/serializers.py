@@ -57,7 +57,39 @@ class PatientSignUpSerializer(RegisterSerializer):
         patient = Patient(user = user)
         patient.save()
         return user
-
+    
+class HospitalAdminSignUpSerializer(RegisterSerializer):
+    first_name = serializers.CharField( write_only=True, required=True,max_length = 50)
+    last_name = serializers.CharField(max_length = 50)
+    country = CountryField()
+    gender = serializers.ChoiceField(choices=GENDER)
+    Phone_number = serializers.CharField()
+   
+    def get_cleaned_data(self):
+        return {
+            'username': self.validated_data.get('username', ''),
+            'password1': self.validated_data.get('password1', ''),
+            'password2': self.validated_data.get('password2', ''),
+            'email': self.validated_data.get('email', ''),
+            'first_name' : self.validated_data.get('first_name', ''),
+            'last_name' : self.validated_data.get('last_name', ''),
+            'Phone_number' : self.validated_data.get('Phone_number', ''),
+            'country' : self.validated_data.get('country', ''),
+            'gender': self.validated_data.get('gender', ''),
+        }
+    
+    def save(self, request):
+        adapter = get_adapter()
+        user = adapter.new_user(request)
+        self.cleaned_data = self.get_cleaned_data()
+        user.role = 'doctor'
+        user.is_hospital = True
+        user.Phone_number = self.cleaned_data.get('Phone_number')
+        user.country = self.cleaned_data.get('country')
+        user.gender = self.cleaned_data.get('gender')
+        adapter.save_user(request, user, self)
+        return user
+       
 class DoctorRegisterationSerializer(RegisterSerializer):
 
     first_name = serializers.CharField(write_only=True, required=True, max_length=50)
@@ -142,9 +174,7 @@ class LoginSerializer(serializers.Serializer):
         # It will be used in the view.
         attrs['user'] = user
         return attrs
-
-
-        
+       
 class UserSerializer(serializers.ModelSerializer):
   class Meta:
     model = User
