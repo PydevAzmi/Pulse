@@ -7,7 +7,7 @@ from accounts.models import Patient, User, Doctor,Hospital
 class HospitalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hospital
-        fields = ['id',"name","country_address"]
+        fields = ['id',"admin","name","country_address", 'image']
 
 class DoctorSerializer(serializers.ModelSerializer):
     hospital =HospitalSerializer(read_only= True)
