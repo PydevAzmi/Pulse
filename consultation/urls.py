@@ -23,4 +23,5 @@ urlpatterns = [
     #API
     path("api/", include(router.urls)),
     path('api/doctors/', api.DoctorListView.as_view(), name='doctor-list'),
+    path('api/hospitals/', api.HospitalsListView.as_view(), name='hospital-list'),
 ]
