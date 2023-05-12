@@ -3,7 +3,7 @@ from requests import Response
 from . import serializers
 from rest_framework import permissions, viewsets, generics ,status
 from .models import Survey,Review,Report,MLModel, Consultation
-from accounts.models import Doctor, Patient
+from accounts.models import Doctor, Patient, Hospital
 from .permissions import IsPatientOrReadOnly ,IsDoctorOrReadOnly, IsPatientOrDoctor
 from rest_framework.exceptions import ValidationError
 # For ML
@@ -226,6 +226,11 @@ class DoctorListView(generics.ListAPIView):
         if specialist is not None:
             queryset = queryset.filter(specialist__icontains=specialist)
         return queryset
+
+class HospitalsListView(generics.ListAPIView):
+    serializer_class = serializers.HospitalSerializer
+    permission_classes = (permissions.IsAuthenticated, IsPatientOrReadOnly)
+    queryset = Hospital.objects.all()
 
 class ConsultationRequestViewSet(viewsets.ModelViewSet):
     queryset = Consultation.objects.all()
