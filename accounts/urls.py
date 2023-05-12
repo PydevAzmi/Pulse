@@ -21,6 +21,7 @@ urlpatterns = [
     path("logout/", views.logout, name="Logout"),
     #Api
     path("api/patient-register/",api.PatientRegisterApi.as_view() ,name = "patient_register"),
+    path("api/hospital-admin-register/",api.HospitalAdminRegisterApi.as_view() ,name = "hospitalAdmin_register"),
     path("api/doctor-register/",api.DoctorRegisterationApi.as_view() ,name = "doctor_register"),
     path("api/patient-survey/<int:pk>",api.PatientSurveyList.as_view() ,name = "patient_survey"),
     path("api/", include(router.urls)),
