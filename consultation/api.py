@@ -254,10 +254,8 @@ class ConsultationRequestViewSet(viewsets.ModelViewSet):
             return serializers.ConsultationPatientSerializer
         elif self.action in ('update',"partial_update",'retrieve' ):
             if user.is_authenticated and user.is_patient:
-                print("patient")
                 return serializers.ConsultationPatientSerializer
             elif user.is_authenticated and user.is_doctor:
-                print("doctor")
                 return serializers.ConsultationDoctorSerializer
         else:
             return serializers.ConsultationPatientSerializer
@@ -266,9 +264,9 @@ class ConsultationRequestViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ("create",):
             self.permission_classes = (permissions.IsAuthenticated, IsPatientOrReadOnly )
-        elif self.action in ( "partial_update",):
+        elif self.action in ( "partial_update","update",):
             self.permission_classes = (IsPatientOrDoctor, )
-        elif self.action in ("update", "destroy"):
+        elif self.action in ( "destroy",):
             self.permission_classes = (IsPatientOrReadOnly, )
         else:
             self.permission_classes = (permissions.AllowAny,)
@@ -287,7 +285,15 @@ class ConsultationRequestViewSet(viewsets.ModelViewSet):
             serializer.save(patient=patient, survey = survey, )
 
     def perform_update(self, serializer):
-        survey_id = self.kwargs['survey_id']
-        survey = Survey.objects.get(id = survey_id)
-        patient = Patient.objects.get(user = self.request.user)
-        serializer.save(patient=patient, survey = survey, )
+        user = self.request.user
+        if user.is_authenticated and user.is_patient:
+            survey_id = self.kwargs['survey_id']
+            survey = Survey.objects.get(id = survey_id)
+            serializer.save(patient=survey.patient, survey = survey, )
+            return
+        elif user.is_authenticated and user.is_doctor:
+            consutation = Consultation.objects.get(id = self.kwargs["pk"])
+            serializer.save( consutation = consutation)
+            return 
+
+        

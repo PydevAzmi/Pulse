@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from .models import Survey, Review, Report, MLModel, Consultation
+from .models import Survey, Review, Report, MLModel, Consultation, CHOICES
 from accounts.models import Patient, User, Doctor,Hospital
 
 
@@ -71,9 +71,10 @@ class SurveyRead_Serializer(serializers.ModelSerializer):
 
 class ConsultationPatientSerializer(serializers.ModelSerializer):
     patient = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    status = serializers.ChoiceField(choices=CHOICES, read_only = True)
     class Meta:
         model = Consultation
-        exclude = ['created_at','survey']
+        exclude = ['created_at','survey',]
 
 class ConsultationDoctorSerializer(serializers.ModelSerializer):
     survey =SurveyRead_Serializer(read_only = True)
