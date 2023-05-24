@@ -143,7 +143,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         
         existing_review = Review.objects.filter(patient=patient, doctor = report.doctor).exists()
         if existing_review:
-            raise ValidationError('You can only create one consultation request for a single survey.')
+            raise ValidationError('You can only create one Review for a single Report.')
         else:
             serializer.save(patient=patient, doctor = report.doctor )
 
