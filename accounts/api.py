@@ -102,7 +102,8 @@ class DoctorProfileViewSet(viewsets.ModelViewSet,):
             return Doctor.objects.filter(user=user).select_related('user','hospital','review')
                     
         else:
-            return Doctor.objects.none()
+            return Doctor.objects.all().select_related('user')
+
 
 ## patient Profile
 class PatientProfileViewSet(viewsets.ModelViewSet):
@@ -122,10 +123,10 @@ class PatientProfileViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated and user.is_patient:
-            return Patient.objects.filter(user=user).select_related('user')
-                    
+            print("yesssss")
+            return Patient.objects.filter(user=user).select_related('user')             
         else:
-            return Patient.objects.none()
+            return Patient.objects.all().select_related('user')
 
 class PatientSurveyList(generics.RetrieveAPIView):
     serializer_class = SurveyReadSerializer

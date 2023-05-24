@@ -10,12 +10,26 @@ class IsDoctorOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        patient = Patient.objects.get(user = request.user  )
-        return obj.patient == patient
+        doctor = Doctor.objects.get(user = request.user)
+        return obj == doctor
+
 
 class IsPatientOrReadOnly(permissions.BasePermission):
     """
     Check if Patient is author of the Survey.
+    """
+    def has_permission(self, request, view):
+        return request.user.is_patient 
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        patient = Patient.objects.get(user = request.user  )
+        return obj == patient
+
+class IsPatient(permissions.BasePermission):
+    """
+    Check if Patient .
     """
     def has_permission(self, request, view):
         return request.user.is_patient 

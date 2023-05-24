@@ -186,7 +186,7 @@ class HospitalSerializer(serializers.ModelSerializer):
         fields = ['id',"name"]
 
 class DoctorSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserSerializer(read_only= True)
     hospital =HospitalSerializer(read_only= True)
     review = ReviewReadSerializer(read_only = True)
     class Meta:
@@ -194,7 +194,7 @@ class DoctorSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class PatientSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserSerializer(read_only = True)
     class Meta:
         model = Patient
         fields = "__all__"
