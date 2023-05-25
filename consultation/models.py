@@ -148,7 +148,8 @@ class MLModel(models.Model):
 
 class Consultation(models.Model):
     patient = models.ForeignKey('accounts.Patient', on_delete=models.CASCADE)
-    doctors = models.ManyToManyField('accounts.Doctor', related_name='consultations')
+    doctors = models.ManyToManyField('accounts.Doctor', related_name='consultations_doctor' , null=True ,blank= True)
+    hospital = models.ManyToManyField('accounts.Hospital', related_name='consultations_hospital', null=True ,blank= True)
     survey = models.ForeignKey('Survey',related_name=("survey_request"), on_delete=models.CASCADE)
     status = models.CharField(max_length=50, choices=CONSULTATION_STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)

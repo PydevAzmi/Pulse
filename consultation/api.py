@@ -4,7 +4,7 @@ from . import serializers
 from rest_framework import permissions, viewsets, generics ,status
 from .models import Survey,Review,Report,MLModel, Consultation
 from accounts.models import Doctor, Patient, Hospital
-from .permissions import IsPatientOrReadOnly ,IsDoctorOrReadOnly, IsPatientOrDoctor
+from .permissions import IsPatientOrReadOnly ,IsDoctorOrReadOnly, IsPatientOrDoctorOrHospital
 from rest_framework.exceptions import ValidationError
 # For ML
 from keras.models import load_model
@@ -244,6 +244,9 @@ class ConsultationRequestViewSet(viewsets.ModelViewSet):
         elif user.is_authenticated and user.is_doctor:
             doctor = Doctor.objects.get(user = user)
             return Consultation.objects.filter(doctors=doctor).select_related("survey")
+        elif user.is_authenticated and user.is_hospital:
+            hospital = Hospital.objects.get(user= user)
+            return Consultation.objects.filter(hospital = hospital ).select_related("survey")
         else:
             return Consultation.objects.none() 
         
@@ -256,6 +259,8 @@ class ConsultationRequestViewSet(viewsets.ModelViewSet):
                 return serializers.ConsultationPatientSerializer
             elif user.is_authenticated and user.is_doctor:
                 return serializers.ConsultationDoctorSerializer
+            elif user.is_authenticated and user.is_hospital:
+                return serializers.ConsultationHospitalSerializer
         else:
             return serializers.ConsultationPatientSerializer
 
@@ -264,7 +269,7 @@ class ConsultationRequestViewSet(viewsets.ModelViewSet):
         if self.action in ("create",):
             self.permission_classes = (permissions.IsAuthenticated, IsPatientOrReadOnly )
         elif self.action in ( "partial_update","update",):
-            self.permission_classes = (IsPatientOrDoctor, )
+            self.permission_classes = (IsPatientOrDoctorOrHospital, )
         elif self.action in ( "destroy",):
             self.permission_classes = (IsPatientOrReadOnly, )
         else:
@@ -290,9 +295,8 @@ class ConsultationRequestViewSet(viewsets.ModelViewSet):
             survey = Survey.objects.get(id = survey_id)
             serializer.save(patient=survey.patient, survey = survey, )
             return
-        elif user.is_authenticated and user.is_doctor:
+        elif user.is_authenticated and ( user.is_doctor or user.is_hospital ):
             consutation = Consultation.objects.get(id = self.kwargs["pk"])
             serializer.save( onsutation = consutation)
             return 
-
         

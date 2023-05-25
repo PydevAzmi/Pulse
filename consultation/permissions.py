@@ -1,12 +1,11 @@
 from rest_framework import permissions
-from accounts.models import Patient, Doctor
+from accounts.models import Patient, Doctor, Hospital
 from consultation.models import Consultation
 class IsPatientOrReadOnly(permissions.BasePermission):
     """
     Check if Patient is author of the Survey.
     """
     def has_permission(self, request, view):
-
         return request.user.is_patient 
 
     def has_object_permission(self, request, view, obj):
@@ -30,18 +29,23 @@ class IsDoctorOrReadOnly(permissions.BasePermission):
         return obj.doctor == doctor 
 
 
-class IsPatientOrDoctor(permissions.BasePermission):
+class IsPatientOrDoctorOrHospital(permissions.BasePermission):
     
     def has_permission(self, request, view):
-        return request.user.is_authenticated and (request.user.is_patient or request.user.is_doctor)
+        user = request.user
+        return user.is_authenticated and (user.is_patient or user.is_doctor or user.is_hospital)
     
     def has_object_permission(self, request, view, obj):
+        user = request.user
         if request.method in permissions.SAFE_METHODS:
             return True
-        if request.user.is_authenticated and request.user.is_patient:
-            patient = Patient.objects.get(user = request.user  )
+        if user.is_authenticated and user.is_patient:
+            patient = Patient.objects.get(user = user  )
             return obj.patient == patient
-        elif request.user.is_authenticated and request.user.is_doctor:
-            doctor = Doctor.objects.get(user = request.user)
+        elif user.is_authenticated and user.is_doctor:
+            doctor = Doctor.objects.get(user = user)
             return doctor in obj.doctors.all()
+        elif user.is_authenticated and user.is_hospital:
+            hospital = Hospital.objects.get(user = user)
+            return hospital in obj.hospital.all()
         
