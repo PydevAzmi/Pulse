@@ -69,12 +69,16 @@ class SurveyViewSet(viewsets.ModelViewSet):
         mri_image = survey_data.pop('mri')
         
         from PIL import Image
-        # Preprocess the image as required by the model
-        # resize to (224, 224) and normalize pixel values
 
-        mri_image = tf.keras.preprocessing.image.img_to_array(mri_img)
-        mri_image = mri_image / 255.0
-        mri_image = tf.expand_dims(mri_image, axis=0)
+        # Load the image you want to classify
+        # resize to (224, 224) and normalize pixel values
+        # Preprocess the image as required by the model
+
+        mri_image = Image.open(mri_image)
+        mri_image = mri_image.convert("RGB")
+        mri_image = mri_image.resize((224, 224))
+        mri_image = np.array(mri_image) / 255.0
+        mri_image = np.expand_dims(mri_image, axis=0)
 
 
         ecg_image = Image.open(ecg_image)
@@ -84,16 +88,11 @@ class SurveyViewSet(viewsets.ModelViewSet):
         ecg_image = np.expand_dims(ecg_image, axis=0)
 
 
-
-        # Load the image you want to classify
-        mri_img = tf.keras.preprocessing.image.load_img(mri_image, target_size=(224, 224))
-
-        # Preprocess the image
+        # predict the image class
         mri_prediction = mrimodel.predict(mri_image).argmax(axis = 1)
         mri_prediction = mri_labels[mri_prediction[0]]
 
-        ecg_prediction = ecgmodel.predict(ecg_image)
-        ecg_prediction = ecg_prediction.argmax(axis = 1)
+        ecg_prediction = ecgmodel.predict(ecg_image).argmax(axis = 1)
         ecg_prediction = ecg_labels[ecg_prediction[0]]
 
         # Create new instance of MLModelResult and save to database
@@ -293,7 +292,7 @@ class ConsultationRequestViewSet(viewsets.ModelViewSet):
             return
         elif user.is_authenticated and user.is_doctor:
             consutation = Consultation.objects.get(id = self.kwargs["pk"])
-            serializer.save( consutation = consutation)
+            serializer.save( onsutation = consutation)
             return 
 
         
