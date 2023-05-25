@@ -80,11 +80,11 @@ class ConsultationDoctorSerializer(serializers.ModelSerializer):
     survey =SurveyRead_Serializer(read_only = True)
     class Meta:
         model = Consultation
-        exclude = ['hospital',]
-
+        fields = ['id', 'status', 'created_at', 'survey']
 
 class ConsultationHospitalSerializer(serializers.ModelSerializer):
     survey =SurveyRead_Serializer(read_only = True)
+    
     class Meta:
         model = Consultation
-        exclude = ['doctors',]
+        fields = ['id', 'status', 'created_at', 'survey']
