@@ -144,6 +144,14 @@ The Consultation App API allows you to interact with various resources related t
 - Method: `PUT /survey/{id}/reports/{id}/review/{id}/`: Updates details of a specific review, only patients.
 - Method: `DELETE /survey/{id}/reports/{id}/review/{id}/`: Deletes a specific review, only patients.
 
+<hr>
+
+## Postman Documentation
+
+For interactive API documentation and examples, you can refer to our [Postman documentation](https://documenter.getpostman.com/view/23311056/2s93m7Wgpn). It provides a detailed overview of the API endpoints, request formats, and response structures. You can also test the API directly from the documentation using the provided examples.
+
+<hr>
+
 ## Request and Response Formats
 
 ### Request Format
