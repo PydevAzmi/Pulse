@@ -29,6 +29,7 @@ To get started with the backend project, follow these steps:
 `git clone https://github.com/PydevAzmi/Pulse.git`
 
 2. **Install Dependencies**: Navigate to the project directory and install the required dependencies by running the following command:
+
 `pip install -r requirements.txt`
 
 3. **Configure the Environment**: Set up the necessary environment variables required for the project. Refer to the `config.example.env` file for the required variables and create a new `.env` file with the appropriate values.
@@ -37,7 +38,7 @@ To get started with the backend project, follow these steps:
 
 5. **Run Migrations**: Apply the database migrations using the following command:
 
-`python manage.py migrate`
+<p align= "center"> `python manage.py migrate` </p>
 
 6. **Start the Development Server**: Launch the development server by running the following command:
 
