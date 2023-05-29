@@ -178,8 +178,8 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
   class Meta:
     model = User
-    fields = ['id', 'first_name', 'last_name', 'email']
-
+    fields = ['id', 'first_name', 'last_name', 'email', 'Phone_number']
+        
 class HospitalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hospital

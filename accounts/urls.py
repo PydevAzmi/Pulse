@@ -8,6 +8,7 @@ app_name = "accounts"
  
 router = DefaultRouter()
 router.register(r"dr-profile", api.DoctorProfileViewSet, basename="doctor_user_profile")
+router.register(r"user", api.UserProfileViewSet, basename="user_profile")
 router.register(r"patient-profile", api.PatientProfileViewSet, basename="pateint_user_profile")
 router.register(r"select-doctor", api.DoctorListViewSet,basename="select_doctor")
 

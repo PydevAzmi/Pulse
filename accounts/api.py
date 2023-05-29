@@ -1,7 +1,7 @@
 from .models import User ,Doctor,Patient, Hospital
 from consultation.models import Survey,Report,Review
 from consultation.serializers import SurveyReadSerializer
-from .permssions import IsDoctorOrReadOnly ,IsPatientOrReadOnly
+from .permssions import IsDoctorOrReadOnly ,IsPatientOrReadOnly 
 from rest_framework.authtoken.models import Token
 from rest_auth.registration.views import RegisterView 
 from rest_framework import permissions ,viewsets
@@ -13,6 +13,7 @@ from .serializers import (  LoginSerializer,
                             PatientSignUpSerializer ,
                             DoctorRegisterationSerializer,
                             DoctorSerializer,
+                            UserSerializer,
                             PatientSerializer,
                             UserUpdateSerializer,
                             HospitalAdminSignUpSerializer)
@@ -56,6 +57,8 @@ class LogoutView(APIView):
         logout(request)
         return Response('User Logged out successfully',status=status.HTTP_204_NO_CONTENT)
 
+
+
 class DoctorApi(viewsets.ModelViewSet):
     queryset = Doctor.objects.all( )
     serializer_class = DoctorSerializer
@@ -80,7 +83,23 @@ class DoctorApi(viewsets.ModelViewSet):
     pagination_class = StandardResultsSetPagination
     filterset_fields = ['author']
     '''
-
+## user profile 
+class UserProfileViewSet(viewsets.ModelViewSet,):
+    serializer_class = UserSerializer
+    
+    def get_permissions(self):
+        if self.action in ("create",):
+            self.permission_classes = (permissions.IsAuthenticated , permissions.IsAdminUser)
+        elif self.action in ("update", "partial_update", "destroy"):
+            self.permission_classes = (permissions.AllowAny,)
+        else:
+            self.permission_classes = (permissions.AllowAny,)
+        return super().get_permissions()
+    
+    def get_queryset(self):
+        user = self.request.user
+        return User.objects.filter(id=user.id)
+    
 ## doctor Profile & Dashboard
 class DoctorProfileViewSet(viewsets.ModelViewSet,):
     queryset = Doctor.objects.all()
