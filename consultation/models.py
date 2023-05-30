@@ -50,10 +50,10 @@ class Survey(models.Model):
     doctor = models.ForeignKey('accounts.Doctor', on_delete=models.CASCADE, null=True ,blank=True)
     hospital = models.ForeignKey('accounts.Hospital', on_delete=models.CASCADE, null=True ,blank=True)
     '''
-    mri =models.ImageField(_("MRI"), upload_to=patient_dir_path) 
-    ct = models.ImageField(_("CT"), upload_to=patient_dir_path)
+    mri =models.ImageField(_("MRI"), upload_to=patient_dir_path, null=True, blank=True) 
+    ct = models.ImageField(_("CT"), upload_to=patient_dir_path, null=True, blank=True)
     ecg = models.ImageField(_("ECG"), upload_to=patient_dir_path)
-    title = models.CharField(_("Title"),max_length=200)
+    title = models.CharField(_("Title"),max_length=200, null=True, blank=True)
     description = models.TextField(_("Description"),null=True, blank=True)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     completed = models.BooleanField(_("Completed"),default=False)
@@ -144,7 +144,7 @@ class MLModel(models.Model):
     mri_diagnosis = models.CharField(max_length=50)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     def __str__(self) -> str:
-        return f'{self.survey}> {self.mri_diagnosis}, {self.ecg_diagnosis}'
+        return f'{self.survey}> ecg:, {self.ecg_diagnosis}'
 
 class Consultation(models.Model):
     patient = models.ForeignKey('accounts.Patient', on_delete=models.CASCADE)
