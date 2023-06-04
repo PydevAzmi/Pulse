@@ -7,7 +7,7 @@ from keras.models import load_model
 model = load_model('F:\Githup Repos\Pulse\model.h5')
 
 # Load the image you want to classify
-image_path = "media\patients\john/ahmed\Scans/abnormal100.jpg"
+image_path = "media\patients\john/rr\Scans/abnormal101.jpg"
 
 # Preprocess the image
 def preprocess_data(image_path):
@@ -16,6 +16,7 @@ def preprocess_data(image_path):
     img = cv2.resize(img, (240, 200))
     img = img / 255.0
     img = np.expand_dims(img, axis=-1)
+    
     return img
 
 # Make a prediction
