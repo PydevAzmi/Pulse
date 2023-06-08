@@ -1,5 +1,4 @@
-from django.shortcuts import get_object_or_404 
-from requests import Response
+import os
 from . import serializers
 from rest_framework import permissions, viewsets, generics ,status
 from .models import Survey,Review,Report,MLModel, Consultation
@@ -7,6 +6,8 @@ from accounts.models import Doctor, Patient, Hospital
 from .permissions import IsPatientOrReadOnly ,IsDoctorOrReadOnly, IsPatientOrDoctorOrHospital
 from rest_framework.exceptions import ValidationError
 # For ML
+import cv2
+from PIL import Image
 from keras.models import load_model
 import numpy as np
 import tensorflow as tf
@@ -52,53 +53,57 @@ class SurveyViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
     
     def perform_create(self, serializer):
-        patient = Patient.objects.get(user = self.request.user)
+        user = self.request.user
+        patient = Patient.objects.get(user = user)
         serializer.save(patient=patient)
-
-        # Load machine learning models
-        ecgmodel = load_model('ECG_MODEL.h5')
-        mrimodel = load_model('MRI_MODEL.h5')
-
-        # Define class labels
-        ecg_labels = {0: "normal", 1: "abnormal"}
-        mri_labels = {1: "normal", 0: "abnormal"}
 
         # Retrieve survey data and image from request
         survey_data = serializer.validated_data
         ecg_image = survey_data.pop('ecg')
         mri_image = survey_data.pop('mri')
-        
-        from PIL import Image
-
-        # Load the image you want to classify
-        # resize to (224, 224) and normalize pixel values
-        # Preprocess the image as required by the model
-
+        ecg_image = Image.open(ecg_image)
         mri_image = Image.open(mri_image)
+
+        # Load machine learning models
+        ecgmodel = load_model('F:\Githup Repos\Pulse\model.h5')
+        mrimodel = load_model('MRI_MODEL.h5')
+
+        # Define class labels
+        mri_labels = {1: "normal", 0: "abnormal"}
+
+        # Preprocess the image
         mri_image = mri_image.convert("RGB")
         mri_image = mri_image.resize((224, 224))
         mri_image = np.array(mri_image) / 255.0
         mri_image = np.expand_dims(mri_image, axis=0)
+        
+        def preprocess_data(image):
+            img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            img = cv2.resize(img, (240, 200))
+            img = img / 255.0
+            img = np.expand_dims(img, axis=-1)
+            return img
 
-
-        ecg_image = Image.open(ecg_image)
-        ecg_image = ecg_image.convert("RGB")
-        ecg_image = ecg_image.resize((224, 224))
-        ecg_image = np.array(ecg_image) / 255.0
-        ecg_image = np.expand_dims(ecg_image, axis=0)
-
+        # Make a prediction
+        def predict_image(model, image):
+            image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+            preprocessed_image = preprocess_data(image)
+            predictions = model.predict(np.array([preprocessed_image]))
+            class_labels = ['Normal', 'Myocardial Infarction', 'History of MI', 'Abnormal Heartbeat']
+            predicted_label = class_labels[np.argmax(predictions)]
+            return predicted_label
+        
 
         # predict the image class
         mri_prediction = mrimodel.predict(mri_image).argmax(axis = 1)
         mri_prediction = mri_labels[mri_prediction[0]]
 
-        ecg_prediction = ecgmodel.predict(ecg_image).argmax(axis = 1)
-        ecg_prediction = ecg_labels[ecg_prediction[0]]
+        predicted_image = predict_image(ecgmodel,ecg_image)
 
         # Create new instance of MLModelResult and save to database
         result = MLModel(   survey=serializer.instance,
                             mri_diagnosis = mri_prediction,
-                            ecg_diagnosis = ecg_prediction)
+                            ecg_diagnosis = predicted_image)
         result.save()
         
 
