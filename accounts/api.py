@@ -57,8 +57,6 @@ class LogoutView(APIView):
         logout(request)
         return Response('User Logged out successfully',status=status.HTTP_204_NO_CONTENT)
 
-
-
 class DoctorApi(viewsets.ModelViewSet):
     queryset = Doctor.objects.all( )
     serializer_class = DoctorSerializer
@@ -123,7 +121,6 @@ class DoctorProfileViewSet(viewsets.ModelViewSet,):
         else:
             return Doctor.objects.all().select_related('user')
 
-
 ## patient Profile
 class PatientProfileViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
@@ -165,10 +162,6 @@ class DoctorListViewSet(viewsets.ModelViewSet,):
             self.permission_classes = (permissions.AllowAny,)
         return super().get_permissions()
     
-
- 
-
-
 
 
 """
