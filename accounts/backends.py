@@ -4,11 +4,9 @@ from .models import User
 
 class JWTAuthentication(BaseAuthentication):
     def authenticate(self, request):
-        print("hi")
         jwt_auth = JSONWebTokenAuthentication()
         result = jwt_auth.authenticate(request)
         if result is None:
-            print("Nooon")
             return None
         else:
             token, user, redirect_to = result
