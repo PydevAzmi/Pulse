@@ -8,7 +8,7 @@ model = load_model('F:\Githup Repos\Pulse\model.h5')
 
 # Load the image you want to classify
 image_path = "media\patients\john/rr\Scans/abnormal101.jpg"
-
+image_path2 = "media/test/3.jpeg"
 # Preprocess the image
 def preprocess_data(image_path):
     img = cv2.imread(image_path)
@@ -27,8 +27,10 @@ def predict_image(model, image_path):
     predicted_label = class_labels[np.argmax(predictions)]
     return predicted_label
 
-predicted_image = predict_image(model,image_path)
+predicted_image = predict_image(model,image_path2)
+predicted_image2 = predict_image(model,image_path)
 # Print the predicted class
 print(predicted_image)
+print(predicted_image2)
 
 

@@ -20,6 +20,8 @@ class SurveyViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Survey.objects.all()
     serializer_class = serializers.SurveyReadSerializer
+    ECG = ''
+    #ECG = load_model('F:\Githup Repos\Pulse\model.h5')
 
     # for only the user who loged in
     def get_queryset(self):
@@ -65,7 +67,7 @@ class SurveyViewSet(viewsets.ModelViewSet):
         mri_image = Image.open(mri_image)
 
         # Load machine learning models
-        ecgmodel = load_model('F:\Githup Repos\Pulse\model.h5')
+        self.ECG = load_model('F:\Githup Repos\Pulse\model.h5')
         mrimodel = load_model('MRI_MODEL.h5')
 
         # Define class labels
@@ -98,7 +100,7 @@ class SurveyViewSet(viewsets.ModelViewSet):
         mri_prediction = mrimodel.predict(mri_image).argmax(axis = 1)
         mri_prediction = mri_labels[mri_prediction[0]]
 
-        predicted_image = predict_image(ecgmodel,ecg_image)
+        predicted_image = predict_image(self.ECG,ecg_image)
 
         # Create new instance of MLModelResult and save to database
         result = MLModel(   survey=serializer.instance,
